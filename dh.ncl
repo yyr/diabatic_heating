@@ -101,7 +101,7 @@ begin
   SYEAR = 2014         ;start year
   EYEAR = 2014       ;end year
   FPATH = "./"
-  NTIME = (EYEAR-SYEAR+1)*12
+  NTIME = (EYEAR-SYEAR+1)*2
   R = 287.05
   Cp = 1005
 ;******************************************************
@@ -116,7 +116,7 @@ begin
 ;       xyr = yr - 1
 ;       name1 = FPATH+"temp/air."+xyr+".nc"
 ;       lf = addfile(name1,"r")
-;       ltmp = short2flt (lf->air(364,{1000:100},{latS:latN},:)) ; This part changed from MERRA Q1
+;       ltmp = short2flt (lf->air(364,{1000:150},{latS:latN},:)) ; This part changed from MERRA Q1
 ;       LT = ltmp
 ;    ;  copyatt(LT,ltmp)
 ;     end if
@@ -136,7 +136,7 @@ begin
     dim = dimsizes(T)
     tt=dim(0)
 
-    NLEVS = 12; to be counted from data from 1000hpa to 100hpa
+    NLEVS = 18; to be counted from data from 1000hpa to 100hpa
     do i = 0, NLEVS - 1
       zl = ((/ T&level(i) /))
 ; print (zl)
@@ -163,7 +163,7 @@ begin
 
     ; name = FPATH+"uwnd/uwnd."+yr+".nc"
     ; f= addfile(name,"r")
-    tmp = short2flt (f->u(:,{1000:100},{latS:latN},:))
+    tmp = short2flt (f->u(:,{1000:150},{latS:latN},:))
     U = tmp
 ;      U = tmp*tmp@scale_factor+tmp@add_offset
     copyatt(U,tmp)
@@ -174,7 +174,7 @@ begin
     delete(U)
     ; name = FPATH+"vwnd/vwnd."+yr+".nc"
     ; f= addfile(name,"r")
-    tmp = short2flt (f->v(:,{1000:100},{latS:latN},:))
+    tmp = short2flt (f->v(:,{1000:150},{latS:latN},:))
     V = tmp
 ;      V = tmp*tmp@scale_factor+tmp@add_offset
     copyatt(V,tmp)
@@ -186,7 +186,7 @@ begin
     delete(V)
     ; name = FPATH+"omega/omega."+yr+".nc"
     ; f= addfile(name,"r")
-    tmp = short2flt (f->w(:,{1000:100},{latS:latN},:))
+    tmp = short2flt (f->w(:,{1000:150},{latS:latN},:))
     W = tmp
 ;      W = tmp*tmp@scale_factor+tmp@add_offset
     copyatt(W,tmp)
@@ -197,7 +197,7 @@ begin
     Q1 = Q1 + diffp(PT)*W
     delete(W)
 
-    Q1 = Q1*T/PT*24*3600
+    Q1 = Q1*T/PT*3600
     dsizeQ = dimsizes(Q1)
     print(dsizeQ)
 
