@@ -4,8 +4,8 @@ local df,dim,lat,lon,NLATS,NLONS,i,j,dx,rd
 begin
   rd = 6378140
   dim = dimsizes(x)
-  lat =  (x&lat)
-  lon =  (x&lon)
+  lat =  (x&latitude)
+  lon =  (x&longitude)
   NLATS = dim(2)
   NLONS = dim(3)
   df = x
@@ -33,7 +33,7 @@ local df,dim,lat,lon,NLATS,i,dx,rd
 begin
   rd = 6378140
   dim = dimsizes(x)
-  lat =  (x&lat)
+  lat =  (x&latitude)
   NLATS = dim(2)
   df = x
   i = 0
@@ -99,7 +99,7 @@ begin
 ;define the parameter in this script
 ;************************************************
   SYEAR = 2014         ;start year
-  EYEAR = 2013       ;end year
+  EYEAR = 2014       ;end year
   FPATH = "./"
   NTIME = (EYEAR-SYEAR+1)*12
   R = 287.05
@@ -107,31 +107,30 @@ begin
 ;******************************************************
 ; define the Matrix
 ;******************************************************
-  latS = -30
-  latN =  40
+  latS = 18
+  latN =  22
   do  yr = SYEAR , EYEAR
+    name = FPATH + "2014_JA_input.nc" ;"temp/air."+yr+".nc"
 
-
-    name = FPATH+"temp/air."+yr+".nc"
-
-    if ( yr .gt. SYEAR ) then
-      xyr = yr - 1
-      name1 = FPATH+"temp/air."+xyr+".nc"
-      lf = addfile(name1,"r")
-      ltmp = short2flt (lf->air(364,{1000:100},{latS:latN},:)) ; This part changed from MERRA Q1
-      LT = ltmp
-;       copyatt(LT,ltmp)
-    end if
+;     if ( yr .gt. SYEAR ) then
+;       xyr = yr - 1
+;       name1 = FPATH+"temp/air."+xyr+".nc"
+;       lf = addfile(name1,"r")
+;       ltmp = short2flt (lf->air(364,{1000:100},{latS:latN},:)) ; This part changed from MERRA Q1
+;       LT = ltmp
+;    ;  copyatt(LT,ltmp)
+;     end if
 
     f = addfile(name,"r")
-    tmp = short2flt (f->air(:,{1000:100},{latS:latN},:))
+    list_filevars(f)
+    tmp = short2flt (f->temp(:,{1000:100},{latS:latN},:))
     T = tmp
     copyatt(T,tmp)
 
     printVarSummary (T)
 
     delete(tmp)
-    delete(f)
+    ; delete(f)
     PT = T
     printVarSummary (PT)
     dim = dimsizes(T)
@@ -162,32 +161,32 @@ begin
 ;      print(N+"")
 ;      ;exit
 
-    name = FPATH+"uwnd/uwnd."+yr+".nc"
-    f= addfile(name,"r")
-    tmp = short2flt (f->uwnd(:,{1000:100},{latS:latN},:))
+    ; name = FPATH+"uwnd/uwnd."+yr+".nc"
+    ; f= addfile(name,"r")
+    tmp = short2flt (f->u(:,{1000:100},{latS:latN},:))
     U = tmp
 ;      U = tmp*tmp@scale_factor+tmp@add_offset
     copyatt(U,tmp)
     delete(tmp)
-    delete(f)
+    ; delete(f)
     printVarSummary (U)
     Q1 = Q1 + diffx(PT)*U
     delete(U)
-    name = FPATH+"vwnd/vwnd."+yr+".nc"
-    f= addfile(name,"r")
-    tmp = short2flt (f->vwnd(:,{1000:100},{latS:latN},:))
+    ; name = FPATH+"vwnd/vwnd."+yr+".nc"
+    ; f= addfile(name,"r")
+    tmp = short2flt (f->v(:,{1000:100},{latS:latN},:))
     V = tmp
 ;      V = tmp*tmp@scale_factor+tmp@add_offset
     copyatt(V,tmp)
     delete(tmp)
-    delete(f)
+    ; delete(f)
     printVarSummary (V)
 
     Q1 = Q1 + diffy(PT)*V
     delete(V)
-    name = FPATH+"omega/omega."+yr+".nc"
-    f= addfile(name,"r")
-    tmp = short2flt (f->omega(:,{1000:100},{latS:latN},:))
+    ; name = FPATH+"omega/omega."+yr+".nc"
+    ; f= addfile(name,"r")
+    tmp = short2flt (f->w(:,{1000:100},{latS:latN},:))
     W = tmp
 ;      W = tmp*tmp@scale_factor+tmp@add_offset
     copyatt(W,tmp)
@@ -208,20 +207,23 @@ begin
 
     printVarSummary(Q1)
     fQ1 = Q1
-    lat = Q1&lat
-    lon = Q1&lon
+    lat = Q1&latitude
+    lon = Q1&longitude
     lev = Q1&level*1.
     time = ispan(1,tt,1)*1.0
+    print(lev)
     delete(Q1)
     fQ1!0 = "time"
     fQ1!1 = "lev"
     fQ1!2 = "lat"
     fQ1!3 = "lon"
 ;
-    fQ1&lev = lev
-    fQ1&time = time
-    fQ1&lon = lon
-    fQ1&lat = lat
+    ; printVarSummary(fQ1)
+    ; exit
+    ; fQ1&lev = lev
+    ; fQ1&time = time
+    ; fQ1&lon = lon
+    ; fQ1&lat = lat
 
 
     name = "Q1."+yr+".nc"
